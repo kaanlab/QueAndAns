@@ -1,0 +1,165 @@
+﻿@using QueAndAns.Models
+@page "/simple"
+
+
+<h1>Пока что временная админка!</h1>
+<br>
+
+<MudButton Color="Color.Primary" OnClick="TestAdd" Disabled="@isTbDis">Создать тест</MudButton>
+<br>
+<br>
+<MudExpansionPanels>
+    @if (currentTestContent is not null)
+
+    {
+        <MudExpansionPanel Text="Информация о тесте" MaxHeight="250">
+            <MudForm>
+                <MudItem xs="12" sm="6" md="8">
+                    <MudTextField @bind-Value="currentTestContent.Name" Label="Название теста:" Variant="Variant.Text" Required="true" RequiredError="У теста должно быть описание!"></MudTextField>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="8">
+                    <MudTextField @bind-Value="currentTestContent.Description" Label="Краткое описание теста" Variant="Variant.Text" Required="true" Lines="5" RequiredError="У теста должно быть описание!"></MudTextField>
+                </MudItem>
+            </MudForm>
+            <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="Add"></MudIconButton>
+        </MudExpansionPanel>
+    }
+
+
+    @if (currentQuestion is not null)
+    {
+        <MudExpansionPanel Text="@value" MaxHeight="1000">
+            <MudGrid>
+                <MudRadioGroup @bind-SelectedOption="@RightAnswer">
+                    <MudItem xs="12" sm="4" md="12">
+                        <MudTextField @bind-Value="currentQuestion.Question" Label="Вопрос:" Variant="Variant.Text" Required="true" RequiredError="Поле вопроса не должно быть пустым!"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="10" sm="4" md="3">
+                        <MudTextField @bind-Value="currentQuestion.Answer1" Label="Вариант 1:" Variant="Variant.Outlined"></MudTextField>
+                        <MudRadio Option="@currentQuestion.Answer1" Color="Color.Primary" Disabled="@isDisabled" />
+                    </MudItem>
+                    <MudItem xs="10" sm="4" md="3">
+                        <MudTextField @bind-Value="currentQuestion.Answer2" Label="Вариант 2:" Variant="Variant.Outlined"></MudTextField>
+                        <MudRadio Option="@currentQuestion.Answer2" Color="Color.Primary" Disabled="@isDisabled" />
+                    </MudItem>
+                    <MudItem xs="10" sm="4" md="3">
+                        <MudTextField @bind-Value="currentQuestion.Answer3" Label="Вариант 3:" Variant="Variant.Outlined"></MudTextField>
+                        <MudRadio Option="@currentQuestion.Answer3" Color="Color.Primary" Disabled="@isDisabled" />
+                    </MudItem>
+                    <MudItem xs="10" sm="4" md="3">
+                        <MudTextField @bind-Value="currentQuestion.Answer4" Label="Вариант 4:" Variant="Variant.Outlined"></MudTextField>
+                        <MudRadio Option="@currentQuestion.Answer4" Color="Color.Primary" Disabled="@isDisabled" />
+                    </MudItem>
+                </MudRadioGroup>
+                <MudFab Icon="@Icons.Material.Filled.Save" @onclick="Save" Color="Color.Primary" Disabled="@isDisabled" Style="text-align: right" />
+            </MudGrid>
+        </MudExpansionPanel>
+    }
+</MudExpansionPanels>
+
+<br>
+<br>
+@if (testContent.Any())
+{
+    <MudTable Items="@testContent" Hover="true" Breakpoint="Breakpoint.Sm">
+        <HeaderContent>
+            <MudTh>Название теста</MudTh>
+            <MudTh>Описание теста</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Название теста">@context.Name</MudTd>
+            <MudTd DataLabel="Описание теста">@context.Description</MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+@if (simpleQuestions.Any())
+{
+    <MudTable Items="@simpleQuestions" Hover="true" Breakpoint="Breakpoint.Sm">
+        <HeaderContent>
+            <MudTh>Номер вопроса</MudTh>
+            <MudTh>Содержание</MudTh>
+            <MudTh>Вариант 1</MudTh>
+            <MudTh>Вариант 2</MudTh>
+            <MudTh>Вариант 3</MudTh>
+            <MudTh>Вариант 4</MudTh>
+            <MudTh>Правильный ответ</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Номер вопроса">@(context.QuesId)</MudTd>
+            <MudTd DataLabel="Содержание">@context.Question</MudTd>
+            <MudTd DataLabel="Вариант 1">@context.Answer1</MudTd>
+            <MudTd DataLabel="Вариант 2">@context.Answer2</MudTd>
+            <MudTd DataLabel="Вариант 3">@context.Answer3</MudTd>
+            <MudTd DataLabel="Вариант 4">@context.Answer4</MudTd>
+            <MudTd DataLabel="Правильный ответ">@context.RightIs</MudTd>
+        </RowTemplate>
+    </MudTable>
+    <MudFab Icon="@Icons.Material.Filled.Save" @onclick="SaveTest" Color="Color.Primary" Disabled="@isStbDis" Style="text-align: right" />
+}
+
+
+
+@code {
+
+    bool isDisabled = false;
+    bool isTbDis = false;
+    bool isStbDis = false;
+
+    public Position Position { get; set; } = Position.Left;
+
+    List<SimpleQuestion> simpleQuestions = new List<SimpleQuestion>();
+    SimpleQuestion currentQuestion;
+    int i = 0;
+    string value = "";
+
+    public void TestAdd()
+    {
+        currentTestContent = new TestInformation();
+        isTbDis = true;
+    }
+    public void Add()
+    {
+        isDisabled = false;
+
+        currentQuestion = new SimpleQuestion()
+        {
+            Answer1 = "",
+            Answer2 = "",
+            Answer3 = "",
+            Answer4 = ""
+        };
+        i++;
+        value = "Вопрос " + i;
+
+    }
+    public void Save()
+    {
+        currentQuestion.QuesId = i;
+        currentQuestion.RightIs = RightAnswer;
+        isDisabled = true;
+        simpleQuestions.Add(currentQuestion);
+    }
+    public void SaveTest()
+    {
+        testContent.Add(currentTestContent);
+        isStbDis = true;
+    }
+
+
+
+    protected override void OnInitialized()
+    {
+    }
+
+    public string Test_Name { get; set; }
+    public string Test_Desc { get; set; }
+
+    public string RightAnswer { get; set; }
+
+
+    List<TestInformation> testContent = new List<TestInformation>();
+    TestInformation currentTestContent;
+
+
+}

@@ -1,0 +1,100 @@
+﻿@using QueAndAns.Models
+@page "/"
+
+<h1>Всякие и не очень вопросы</h1>
+<br>
+<br>
+
+@foreach (var question in simpleQuestions)
+{
+    <MudText Typo="Typo.h5">@question.Question</MudText>
+    <br>
+    <MudRadioGroup @bind-SelectedOption="@question.SelectedAnswer">
+        <MudRadio Option="@question.Answer1" Disabled="@isDisabled" Color="Color.Primary">@question.Answer1</MudRadio>
+        <MudRadio Option="@question.Answer2" Disabled="@isDisabled" Color="Color.Primary">@question.Answer2</MudRadio>
+        <MudRadio Option="@question.Answer3" Disabled="@isDisabled" Color="Color.Primary">@question.Answer3</MudRadio>
+        <MudRadio Option="@question.Answer4" Disabled="@isDisabled" Color="Color.Primary">@question.Answer4</MudRadio>
+    </MudRadioGroup>
+    <br>
+    <MudText Class="ml-4">Вы выбрали: @question.SelectedAnswer</MudText>
+}
+<br />
+@foreach (var question in mediumQuestions)
+{
+    <MudText Typo="Typo.h5">@question.Question</MudText>
+    <br />
+    <MudCheckBox @bind-Checked="" Label="@question.Answer1" Color="Color.Primary"></MudCheckBox>
+    <MudCheckBox @bind-Checked="" Label="@question.Answer2" Color="Color.Primary"></MudCheckBox>
+    <MudCheckBox @bind-Checked="" Label="@question.Answer3" Color="Color.Primary"></MudCheckBox>
+    <MudCheckBox @bind-Checked="" Label="@question.Answer4" Color="Color.Primary"></MudCheckBox>
+    <MudCheckBox @bind-Checked="" Label="@question.Answer5" Color="Color.Primary"></MudCheckBox>
+
+}
+
+<br>
+<div class="d-flex align-center">
+    <MudButton Variant="Variant.Outlined" OnClick="Reset" Disabled="@isDisabled">Сбросить</MudButton>
+</div>
+<br>
+<MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Color="Color.Primary" Disabled="@isDisabled" OnClick="CheckAnswer">Проверить</MudButton>
+<br>
+<p>Получено баллов: @counter</p>
+
+
+
+@code
+{
+    List<SimpleQuestion> simpleQuestions;
+    List<MediumQuestion> mediumQuestions;
+    List<string> rightAre;
+    bool content = false;
+    int counter = 0;
+    string currentAnswer = "";
+    string currentRight = "";
+    Dictionary<int, string> AnswerDic = new Dictionary<int, string>();
+    bool isDisabled = false;
+
+    public string SelectedOption { get; set; }
+
+    private void Reset()
+    {
+        foreach (var question in simpleQuestions)
+        {
+            question.SelectedAnswer = null;
+        }
+    }
+
+
+
+
+    protected override void OnInitialized()
+    {
+        simpleQuestions = new List<SimpleQuestion>()
+{
+            new SimpleQuestion() {Question = "Сколько будет 5 + 5?", Answer1 = "10", Answer2 = "15", Answer3 = "9", Answer4 = "5", RightIs = "10", QuesId = 1 },
+            new SimpleQuestion() {Question = "За чем вода в стакане?", Answer1 = "За стеклом", Answer2 = "За водой", Answer3 = "Не знаю", Answer4 = "Дома", RightIs = "За стеклом", QuesId = 2},
+            new SimpleQuestion() {Question = "Столица Петрозавдоска?", Answer1 = "Нету такой :(", Answer2 = "Москва", Answer3 = "Алматы", Answer4 = "Поселок Лучевое", RightIs = "Нету такой :(", QuesId = 3},
+        };
+        rightAre = new List<string>()
+{
+            "1","7","11"
+        };
+        mediumQuestions = new List<MediumQuestion>()
+{
+            new MediumQuestion() {Question = "Назовите простые числа:", Answer1 = "1", Answer2 = "2", Answer3 = "4", Answer4 = "7", Answer5= "11", RightAre = rightAre }
+        };
+    }
+    private void CheckAnswer()
+    {
+        foreach (var question in simpleQuestions)
+        {
+            if (question.SelectedAnswer == question.RightIs)
+            {
+                counter++;
+            }
+            isDisabled = true;
+        }
+    }
+
+
+}
